@@ -5,9 +5,9 @@ ROS2 Wrapper for OpenCV Aruco Marker Tracking
 This package depends on a recent version of OpenCV python bindings:
 
 ```
-pip3 install scikit-build # or pip3
-pip3 install opencv-python # or pip3
+pip install opencv-contrib-python # or pip3
 ```
+
 ## ROS2 API for the ros2_aruco Node
 
 This node locates Aruco AR markers in images and publishes their ids and poses.
