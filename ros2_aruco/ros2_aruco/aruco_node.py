@@ -15,7 +15,7 @@ Published Topics:
        marker ids.
 
 Parameters:
-    marker_size - size of the markers in meters (default .125)
+    marker_size - size of the markers in meters (default .0625)
     aruco_dictionary_id - dictionary that was used to generate markers
                           (default DICT_5X5_250)
     image_topic - image topic to subscribe to (default /camera/image_raw)
@@ -47,16 +47,18 @@ class ArucoNode(rclpy.node.Node):
         super().__init__('aruco_node')
 
         # Declare and read parameters
-        self.declare_parameter("marker_size", .125)
+        self.declare_parameter("marker_size", .0625)
         self.declare_parameter("aruco_dictionary_id", "DICT_5X5_250")
         self.declare_parameter("image_topic", "/camera/image_raw")
         self.declare_parameter("camera_info_topic", "/camera/camera_info")
+        self.declare_parameter("camera_frame", None)
 
         self.marker_size = self.get_parameter("marker_size").get_parameter_value().double_value
         dictionary_id_name = self.get_parameter(
             "aruco_dictionary_id").get_parameter_value().string_value
         image_topic = self.get_parameter("image_topic").get_parameter_value().string_value
         info_topic = self.get_parameter("camera_info_topic").get_parameter_value().string_value
+        self.camera_frame = self.get_parameter("camera_frame").get_parameter_value().string_value
 
         # Make sure we have a valid dictionary id:
         try:
@@ -106,10 +108,16 @@ class ArucoNode(rclpy.node.Node):
         cv_image = self.bridge.imgmsg_to_cv2(img_msg,
                                              desired_encoding='mono8')
         markers = ArucoMarkers()
-        markers.header.frame_id = img_msg.header.frame_id
-        markers.header.stamp = img_msg.header.stamp
         pose_array = PoseArray()
-        pose_array.header.frame_id = img_msg.header.frame_id
+        if self.camera_frame is None:
+            markers.header.frame_id = self.info_msg.header.frame_id
+            pose_array.header.frame_id = self.info_msg.header.frame_id
+        else:
+            markers.header.frame_id = self.camera_frame
+            pose_array.header.frame_id = self.camera_frame
+            
+            
+        markers.header.stamp = img_msg.header.stamp
         pose_array.header.stamp = img_msg.header.stamp
 
         corners, marker_ids, rejected = cv2.aruco.detectMarkers(cv_image,
@@ -119,11 +127,11 @@ class ArucoNode(rclpy.node.Node):
 
             if cv2.__version__ > '4.0.0':
                 rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners,
-                                                                      0.125, self.intrinsic_mat,
+                                                                      self.marker_size, self.intrinsic_mat,
                                                                       self.distortion)
             else:
                 rvecs, tvecs = cv2.aruco.estimatePoseSingleMarkers(corners,
-                                                                   0.125, self.intrinsic_mat,
+                                                                   self.marker_size, self.intrinsic_mat,
                                                                    self.distortion)
             for i, marker_id in enumerate(marker_ids):
                 pose = Pose()

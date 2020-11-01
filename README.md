@@ -21,10 +21,11 @@ Published Topics:
 * `/aruco_markers` (`ros2_aruco_interfaces.msg.ArucoMarkers`) - Provides an array of all poses along with the corresponding marker ids
 
 Parameters:
-* `marker_size` - size of the markers in meters (default .125)
+* `marker_size` - size of the markers in meters (default .0625)
 * `aruco_dictionary_id` - dictionary that was used to generate markers (default `DICT_5X5_250`)
 * `image_topic` - image topic to subscribe to (default `/camera/image_raw`)
 * `camera_info_topic` - Camera info topic to subscribe to (default `/camera/camera_info`)
+* `camera_frame` - Camera optical frame to use (default to the frame id provided by the camera info message.)
 
 ## Generating Marker Images
 
