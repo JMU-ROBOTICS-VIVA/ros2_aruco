@@ -40,6 +40,8 @@ from sensor_msgs.msg import Image
 from geometry_msgs.msg import PoseArray, Pose
 from ros2_aruco_interfaces.msg import ArucoMarkers
 
+from visualization_msgs.msg import Marker, MarkerArray
+
 
 class ArucoNode(rclpy.node.Node):
 
@@ -82,6 +84,9 @@ class ArucoNode(rclpy.node.Node):
         # Set up publishers
         self.poses_pub = self.create_publisher(PoseArray, 'aruco_poses', 10)
         self.markers_pub = self.create_publisher(ArucoMarkers, 'aruco_markers', 10)
+        # self.disp_marker_pub_arr = self.create_publisher(MarkerArray, 'visualization_marker_array', 1)
+        self.disp_marker_pub = self.create_publisher(Marker, 'visualization_marker', 1)
+
 
         # Set up fields for camera parameters
         self.info_msg = None
@@ -152,8 +157,33 @@ class ArucoNode(rclpy.node.Node):
                 markers.poses.append(pose)
                 markers.marker_ids.append(marker_id[0])
 
+                self.show_marker(markers.header.frame_id, pose, int(marker_id[0]))
+
             self.poses_pub.publish(pose_array)
             self.markers_pub.publish(markers)
+
+    def show_marker(self, frame_id, pose, marker_id):
+        marker_ = Marker()
+        marker_.header.frame_id = frame_id
+        marker_.type = marker_.CUBE
+        marker_.action = marker_.ADD
+        marker_.lifetime = rclpy.duration.Duration(seconds=1.0).to_msg()
+        marker_.id = marker_id
+        marker_.pose.position.x = pose.position.x
+        marker_.pose.position.y = pose.position.y
+        marker_.pose.position.z = pose.position.z
+        marker_.pose.orientation.x = pose.orientation.x
+        marker_.pose.orientation.y = pose.orientation.y
+        marker_.pose.orientation.z = pose.orientation.z
+        marker_.pose.orientation.w = pose.orientation.w
+        marker_.scale.x = 1.0 * self.marker_size
+        marker_.scale.y = 1.0 * self.marker_size
+        marker_.scale.z = 0.2 * self.marker_size
+        marker_.color.a = 0.9
+        marker_.color.r = 0.0
+        marker_.color.g = 1.0
+        marker_.color.b = 0.0
+        self.disp_marker_pub.publish(marker_)
 
 
 def main():
