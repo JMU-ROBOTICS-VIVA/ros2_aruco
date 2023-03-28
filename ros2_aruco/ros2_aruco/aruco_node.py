@@ -38,6 +38,7 @@ from sensor_msgs.msg import CameraInfo
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import PoseArray, Pose
 from ros2_aruco_interfaces.msg import ArucoMarkers
+from rcl_interfaces.msg import ParameterDescriptor, ParameterType
 
 
 class ArucoNode(rclpy.node.Node):
@@ -46,11 +47,20 @@ class ArucoNode(rclpy.node.Node):
         super().__init__('aruco_node')
 
         # Declare and read parameters
-        self.declare_parameter("marker_size", .0625)
-        self.declare_parameter("aruco_dictionary_id", "DICT_5X5_250")
-        self.declare_parameter("image_topic", "/camera/image_raw")
-        self.declare_parameter("camera_info_topic", "/camera/camera_info")
-        self.declare_parameter("camera_frame", "camera_link")
+        self.declare_parameter(name = "marker_size", value = 0.0625, 
+                               descriptor = ParameterDescriptor(type = ParameterType.PARAMETER_DOUBLE, description = "Size of the markers in meters."))
+        
+        self.declare_parameter(name = "aruco_dictionary_id", value = "DICT_5X5_250", 
+                               descriptor = ParameterDescriptor(type = ParameterType.PARAMETER_STRING, description = "Dictionary that was used to generate markers."))
+        
+        self.declare_parameter(name = "image_topic", value = "/camera/image_raw", 
+                               descriptor = ParameterDescriptor(type = ParameterType.PARAMETER_STRING, description = "Image topic to subscribe to."))
+        
+        self.declare_parameter(name = "camera_info_topic", value = "/camera/camera_info", 
+                               descriptor = ParameterDescriptor(type = ParameterType.PARAMETER_STRING, description = "Camera info topic to subscribe to."))
+        
+        self.declare_parameter(name = "camera_frame", value = "camera_link", 
+                               descriptor = ParameterDescriptor(type = ParameterType.PARAMETER_STRING, description = "Camera optical frame to use."))
 
         self.marker_size = self.get_parameter("marker_size").get_parameter_value().double_value
         dictionary_id_name = self.get_parameter(
