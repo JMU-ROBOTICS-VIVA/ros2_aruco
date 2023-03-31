@@ -2,10 +2,10 @@
 
 ROS2 Wrapper for OpenCV Aruco Marker Tracking
 
-This package depends on a recent version of OpenCV python bindings:
+This package depends on a recent version of OpenCV python bindings and transforms3d library:
 
 ```
-pip install opencv-contrib-python # or pip3
+pip3 install opencv-contrib-python transforms3d
 ```
 
 ## ROS2 API for the ros2_aruco Node
