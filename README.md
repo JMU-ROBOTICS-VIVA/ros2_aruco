@@ -27,6 +27,17 @@ Parameters:
 * `camera_info_topic` - Camera info topic to subscribe to (default `/camera/camera_info`)
 * `camera_frame` - Camera optical frame to use (default to the frame id provided by the camera info message.)
 
+## Running Marker Detection
+
+1. Using the launch file - parameters will be loaded from _aruco\_parameters.yaml_.
+```
+ros2 launch ros2_aruco aruco_recognition.launch.py
+```
+2. As a single ROS 2 node - you can specify parameter values at startup by adding `--ros-args -p marker_size:=.05`, for example.
+```
+ros2 run ros2_aruco aruco_node
+```
+
 ## Generating Marker Images
 
 ```
