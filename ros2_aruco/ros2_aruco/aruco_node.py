@@ -84,7 +84,7 @@ class ArucoNode(rclpy.node.Node):
 
         self.declare_parameter(
             name="camera_frame",
-            value="camera_link",
+            value="",
             descriptor=ParameterDescriptor(
                 type=ParameterType.PARAMETER_STRING,
                 description="Camera optical frame to use.",
@@ -94,15 +94,23 @@ class ArucoNode(rclpy.node.Node):
         self.marker_size = (
             self.get_parameter("marker_size").get_parameter_value().double_value
         )
+        self.get_logger().info(f"Marker size: {self.marker_size}")
+
         dictionary_id_name = (
             self.get_parameter("aruco_dictionary_id").get_parameter_value().string_value
         )
+        self.get_logger().info(f"Marker type: {dictionary_id_name}")
+
         image_topic = (
             self.get_parameter("image_topic").get_parameter_value().string_value
         )
+        self.get_logger().info(f"Image topic: {image_topic}")
+
         info_topic = (
             self.get_parameter("camera_info_topic").get_parameter_value().string_value
         )
+        self.get_logger().info(f"Image info topic: {info_topic}")
+
         self.camera_frame = (
             self.get_parameter("camera_frame").get_parameter_value().string_value
         )
@@ -156,7 +164,7 @@ class ArucoNode(rclpy.node.Node):
         cv_image = self.bridge.imgmsg_to_cv2(img_msg, desired_encoding="mono8")
         markers = ArucoMarkers()
         pose_array = PoseArray()
-        if self.camera_frame is None:
+        if self.camera_frame == "":
             markers.header.frame_id = self.info_msg.header.frame_id
             pose_array.header.frame_id = self.info_msg.header.frame_id
         else:
